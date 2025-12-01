@@ -55,7 +55,7 @@ az webapp create \
     --name "$WEB_APP_NAME" \
     --resource-group "$RESOURCE_GROUP" \
     --plan "$APP_SERVICE_PLAN" \
-    --runtime "NODE:20-lts"
+    --runtime "NODE:22-lts"
 
 echo -e "${GREEN}✓ Web App created${NC}"
 

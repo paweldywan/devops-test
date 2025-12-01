@@ -12,11 +12,12 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.url === '/') {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(`
       <!DOCTYPE html>
-      <html>
+      <html lang="en">
         <head>
+          <meta charset="UTF-8">
           <title>DevOps Test App</title>
           <style>
             body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }

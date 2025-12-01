@@ -129,20 +129,29 @@ try {
         --resource-group $ResourceGroupName `
         --name $actionGroupName `
         --short-name "AppAlerts" `
-        --email-receiver name="AdminEmail" email-address=$AlertEmailAddress `
+        --action email AdminEmail $AlertEmailAddress `
         --output none
 
     $actionGroup = az monitor action-group show `
         --resource-group $ResourceGroupName `
         --name $actionGroupName | ConvertFrom-Json
+    
+    if (-not $actionGroup) {
+        throw "Failed to create Action Group"
+    }
     Write-Status "Action Group created" -Type "Success"
 
-    # Create CPU Alert Rule (> 80% for 5 minutes)
+    # Get App Service Plan for CPU/Memory metrics
+    Write-Status "Getting App Service Plan..."
+    $appServicePlanId = $webApp.appServicePlanId
+    Write-Status "Found App Service Plan" -Type "Success"
+
+    # Create CPU Alert Rule (> 80% for 5 minutes) - scoped to App Service Plan
     Write-Status "Creating CPU percentage alert rule..."
     az monitor metrics alert create `
         --name "alert-cpu-high-$WebAppName" `
         --resource-group $ResourceGroupName `
-        --scopes $webAppResourceId `
+        --scopes $appServicePlanId `
         --condition "avg CpuPercentage > 80" `
         --window-size 5m `
         --evaluation-frequency 1m `
@@ -152,12 +161,12 @@ try {
         --output none
     Write-Status "CPU alert rule created (threshold: 80%)" -Type "Success"
 
-    # Create Memory Alert Rule (> 85% for 5 minutes)
+    # Create Memory Alert Rule (> 85% for 5 minutes) - scoped to App Service Plan
     Write-Status "Creating memory percentage alert rule..."
     az monitor metrics alert create `
         --name "alert-memory-high-$WebAppName" `
         --resource-group $ResourceGroupName `
-        --scopes $webAppResourceId `
+        --scopes $appServicePlanId `
         --condition "avg MemoryPercentage > 85" `
         --window-size 5m `
         --evaluation-frequency 1m `
@@ -199,12 +208,15 @@ try {
 
     # Enable diagnostic settings to send logs to Log Analytics
     Write-Status "Enabling diagnostic settings..."
+    $logsConfig = '[{\"category\":\"AppServiceHTTPLogs\",\"enabled\":true},{\"category\":\"AppServiceConsoleLogs\",\"enabled\":true},{\"category\":\"AppServiceAppLogs\",\"enabled\":true}]'
+    $metricsConfig = '[{\"category\":\"AllMetrics\",\"enabled\":true}]'
+    
     az monitor diagnostic-settings create `
         --name "diag-$WebAppName" `
         --resource $webAppResourceId `
         --workspace $logAnalytics.id `
-        --logs '[{"category": "AppServiceHTTPLogs", "enabled": true}, {"category": "AppServiceConsoleLogs", "enabled": true}, {"category": "AppServiceAppLogs", "enabled": true}]' `
-        --metrics '[{"category": "AllMetrics", "enabled": true}]' `
+        --logs $logsConfig `
+        --metrics $metricsConfig `
         --output none
     Write-Status "Diagnostic settings enabled" -Type "Success"
 
