@@ -10,7 +10,7 @@ on:
   workflow_dispatch:  # Allow manual trigger
 
 env:
-  AZURE_WEBAPP_NAME: 'your-webapp-name'  # Set this to your Web App name
+  AZURE_WEBAPP_NAME: 'webapp-myapp-dev-1764616725'
   NODE_VERSION: '20.x'
 
 jobs:
