@@ -36,7 +36,7 @@ param(
     [string]$WebAppName,
 
     [Parameter(Mandatory = $false)]
-    [string]$Location = "eastus",
+    [string]$Location = "centralus",
 
     [Parameter(Mandatory = $true)]
     [string]$AlertEmailAddress
