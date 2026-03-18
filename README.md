@@ -4,7 +4,7 @@ A simple Node.js application deployed to Azure App Service with CI/CD via GitHub
 
 ## 🚀 Live Demo
 
-https://webapp-myapp-dev-1764619174.azurewebsites.net
+https://webapp-myapp-dev-1773860088.azurewebsites.net
 
 ## 📁 Project Structure
 
